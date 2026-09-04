@@ -2,10 +2,11 @@ import { useState } from 'react';
 import Login from './components/Login';
 import CareerForm from './components/CareerForm';
 import HistoryView from './components/HistoryView';
+import AdminDashboard from './components/AdminDashboard';
 
 // view: 'menu' | 'form' | 'history'
 export default function App() {
-  const [student, setStudent] = useState(null); // { studentId, studentName }
+  const [student, setStudent] = useState(null); // { studentId, studentName, isAdmin, password }
   const [view, setView] = useState('menu');
   const [justSubmitted, setJustSubmitted] = useState(false);
 
@@ -19,6 +20,23 @@ export default function App() {
     return (
       <div className="app-shell">
         <Login onLoginSuccess={setStudent} />
+      </div>
+    );
+  }
+
+  if (student.isAdmin) {
+    return (
+      <div className="app-shell">
+        <div className="app-header">
+          <span className="brand">나의 진로 기록장 · 관리자</span>
+          <div>
+            <span className="student-name">{student.studentName}님</span>{' '}
+            <button className="logout-link" onClick={handleLogout}>
+              로그아웃
+            </button>
+          </div>
+        </div>
+        <AdminDashboard studentId={student.studentId} password={student.password} />
       </div>
     );
   }

@@ -332,6 +332,48 @@ textarea:focus-visible {
   font-size: 14px;
 }
 
+/* --- Admin --- */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.admin-table th {
+  text-align: left;
+  font-size: 12px;
+  color: #5b5546;
+  font-weight: 600;
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--ink);
+}
+
+.admin-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-table tr.row-pending {
+  background: #fbf1ec;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-done {
+  background: #e4ede4;
+  color: var(--sage-dark);
+}
+
+.badge-pending {
+  background: #f6dfd3;
+  color: var(--error);
+}
+
 .back-link {
   background: none;
   border: none;

@@ -1,6 +1,6 @@
 // Apps Script 배포 후 발급받은 웹 앱 URL로 교체하세요.
 // 예: https://script.google.com/macros/s/AKfycb.../exec
-export const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL';
+export const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxs3ql1zk30wwCgIxCsfBEC-gkf5C1CKotEoERXnAFnNcE0anHkcDpjz-8mn8urTwzv4A/exec';
 
 // DATA 탭에 저장할 필드 정의 (라벨 + 입력 방식)
 // Code.gs의 DATA_FIELDS 배열과 key가 반드시 일치해야 합니다.

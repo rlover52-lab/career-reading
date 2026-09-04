@@ -23,3 +23,7 @@ export function saveData(studentId, data) {
 export function getData(studentId) {
   return callScript({ action: 'getData', studentId });
 }
+
+export function getAdminOverview(studentId, password) {
+  return callScript({ action: 'adminOverview', studentId, password });
+}

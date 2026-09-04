@@ -20,7 +20,12 @@ export default function Login({ onLoginSuccess }) {
     try {
       const result = await login(studentId.trim(), password.trim());
       if (result.success) {
-        onLoginSuccess({ studentId: result.studentId, studentName: result.studentName });
+        onLoginSuccess({
+          studentId: result.studentId,
+          studentName: result.studentName,
+          isAdmin: !!result.isAdmin,
+          password: password.trim(),
+        });
       } else {
         setError(result.message || '로그인에 실패했습니다.');
       }
