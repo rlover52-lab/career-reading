@@ -77,7 +77,7 @@ export default function App() {
 
           <div className="menu-card">
             <h2>나의 도서 현황</h2>
-            <p>학교 도서관에서 아직 확인되지 않은 책이 있는지 보고, 정확한 정보를 입력해보세요.</p>
+            <p>2학기에 읽고 싶다고 적은 책이 학교 도서관에 있는지 확인해보세요.</p>
             <button onClick={() => setView('books')}>확인하러 가기</button>
           </div>
         </div>
@@ -97,7 +97,9 @@ export default function App() {
 
       {view === 'history' && <HistoryView studentId={student.studentId} onCancel={() => setView('menu')} />}
 
-      {view === 'books' && <BookStatus studentId={student.studentId} onCancel={() => setView('menu')} />}
+      {view === 'books' && (
+        <BookStatus studentId={student.studentId} studentName={student.studentName} onCancel={() => setView('menu')} />
+      )}
     </div>
   );
 }

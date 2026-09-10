@@ -52,7 +52,7 @@ export const FORM_SECTIONS = [
     title: '2학기 계획',
     description: '2학기 활동을 위한 계획을 세워볼까요.',
     fields: [
-      { key: 'nextBooks', label: '2학기에 읽고 싶은 책 (1~3개)', type: 'textarea', required: true },
+      { key: 'nextBooks', label: '2학기에 읽고 싶은 책 (1~3개)', type: 'textarea', required: true, librarySearchable: true },
       {
         key: 'presentationPreference',
         label: '발표 방식 선호',
