@@ -190,9 +190,16 @@ export default function CareerForm({ studentId, studentName, onCancel, onDone })
               {checkResults[field.key] && checkResults[field.key].length > 0 && (
                 <ul style={{ margin: '8px 0 0', paddingLeft: 18, fontSize: 13 }}>
                   {checkResults[field.key].map((r, i) => (
-                    <li key={i} style={{ marginBottom: 4 }}>
-                      {r.title}
-                      {r.author ? ` (${r.author})` : ''} — {r.statusLabel}
+                    <li key={i} style={{ marginBottom: 8 }}>
+                      <div>
+                        입력한 내용: {r.title}
+                        {r.author ? ` (${r.author})` : ''} — {r.statusLabel}
+                      </div>
+                      {r.detail && (
+                        <div style={{ color: '#5b5546', whiteSpace: 'pre-wrap', marginTop: 2 }}>
+                          찾은 책: {r.detail}
+                        </div>
+                      )}
                     </li>
                   ))}
                 </ul>
