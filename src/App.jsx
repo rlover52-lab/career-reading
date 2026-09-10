@@ -2,9 +2,10 @@ import { useState } from 'react';
 import Login from './components/Login';
 import CareerForm from './components/CareerForm';
 import HistoryView from './components/HistoryView';
+import BookStatus from './components/BookStatus';
 import AdminDashboard from './components/AdminDashboard';
 
-// view: 'menu' | 'form' | 'history'
+// view: 'menu' | 'form' | 'history' | 'books'
 export default function App() {
   const [student, setStudent] = useState(null); // { studentId, studentName, isAdmin, password }
   const [view, setView] = useState('menu');
@@ -73,6 +74,12 @@ export default function App() {
             <p>지금까지 제출한 내용을 다시 불러와 확인할 수 있어요.</p>
             <button onClick={() => setView('history')}>이력 보기</button>
           </div>
+
+          <div className="menu-card">
+            <h2>나의 도서 현황</h2>
+            <p>학교 도서관에서 아직 확인되지 않은 책이 있는지 보고, 정확한 정보를 입력해보세요.</p>
+            <button onClick={() => setView('books')}>확인하러 가기</button>
+          </div>
         </div>
       )}
 
@@ -89,6 +96,8 @@ export default function App() {
       )}
 
       {view === 'history' && <HistoryView studentId={student.studentId} onCancel={() => setView('menu')} />}
+
+      {view === 'books' && <BookStatus studentId={student.studentId} onCancel={() => setView('menu')} />}
     </div>
   );
 }

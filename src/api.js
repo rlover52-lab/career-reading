@@ -27,3 +27,18 @@ export function getData(studentId) {
 export function getAdminOverview(studentId, password) {
   return callScript({ action: 'adminOverview', studentId, password });
 }
+
+// 도서 현황: 학교 도서관에 없는 것으로 확인된, 내 책 목록 불러오기
+export function getMyBooks(studentId) {
+  return callScript({ action: 'getMyBooks', studentId });
+}
+
+// 도서 현황: 책 한 권의 제목/저자/출판사 정보를 확인·저장
+export function confirmBook(studentId, id, title, author, publisher) {
+  return callScript({ action: 'confirmBook', studentId, id, title, author, publisher });
+}
+
+// 도서 현황: 책 제목으로 저자/출판사 후보 자동 검색
+export function searchBookMeta(title) {
+  return callScript({ action: 'searchBookMeta', title });
+}
