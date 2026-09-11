@@ -60,3 +60,8 @@ export function saveReadingLog(studentId, studentName, data) {
 export function getReadingLog(studentId) {
   return callScript({ action: 'getReadingLog', studentId });
 }
+
+// 관리자 전용: 오늘 독서록을 기록했는지 학생별 확인
+export function getReadingLogToday(studentId, password) {
+  return callScript({ action: 'readingLogTodayOverview', studentId, password });
+}
