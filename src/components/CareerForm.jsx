@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FORM_SECTIONS } from '../config';
-import { saveData, getData, checkBooksText } from '../api';
+import { saveData, getData, checkBooksText, searchBookMeta } from '../api';
 
 const ALL_FIELD_KEYS = FORM_SECTIONS.flatMap((s) => s.fields).map((f) => f.key);
 
@@ -13,6 +13,7 @@ export default function CareerForm({ studentId, studentName, onCancel, onDone })
   const [checkingKey, setCheckingKey] = useState(null);
   const [checkResults, setCheckResults] = useState({}); // key -> [{ input, title, author, statusLabel }]
   const [checkError, setCheckError] = useState({}); // key -> 에러 메시지
+  const [metaResults, setMetaResults] = useState({}); // "key__i" -> { loading, results, error }
 
   const section = FORM_SECTIONS[stepIndex];
   const isLastStep = stepIndex === FORM_SECTIONS.length - 1;
@@ -67,10 +68,25 @@ export default function CareerForm({ studentId, studentName, onCancel, onDone })
     }
     setCheckError((prev) => ({ ...prev, [key]: '' }));
     setCheckingKey(key);
+    // 이전 검색 결과(카카오 후보 포함)는 지우고 새로 시작
+    setMetaResults((prev) => {
+      const next = { ...prev };
+      Object.keys(next).forEach((k) => {
+        if (k.startsWith(`${key}__`)) delete next[k];
+      });
+      return next;
+    });
     try {
       const result = await checkBooksText(text);
       if (result.success) {
-        setCheckResults((prev) => ({ ...prev, [key]: result.results || [] }));
+        const results = result.results || [];
+        setCheckResults((prev) => ({ ...prev, [key]: results }));
+        // 도서관에서 확실히 확인되지 않은 책은 저자·출판사도 자동으로 같이 찾아서 보여줌
+        results.forEach((r, i) => {
+          if (r.statusLabel.indexOf('소장 확인') === -1) {
+            fetchMetaFor(key, i, r.title);
+          }
+        });
       } else {
         setCheckError((prev) => ({ ...prev, [key]: result.message || '확인에 실패했습니다.' }));
       }
@@ -78,6 +94,21 @@ export default function CareerForm({ studentId, studentName, onCancel, onDone })
       setCheckError((prev) => ({ ...prev, [key]: '서버에 연결할 수 없습니다.' }));
     } finally {
       setCheckingKey(null);
+    }
+  }
+
+  async function fetchMetaFor(key, index, title) {
+    const metaKey = `${key}__${index}`;
+    setMetaResults((prev) => ({ ...prev, [metaKey]: { loading: true } }));
+    try {
+      const res = await searchBookMeta(title);
+      if (res.success) {
+        setMetaResults((prev) => ({ ...prev, [metaKey]: { loading: false, results: res.results || [] } }));
+      } else {
+        setMetaResults((prev) => ({ ...prev, [metaKey]: { loading: false, error: res.message || '검색에 실패했습니다.' } }));
+      }
+    } catch (err) {
+      setMetaResults((prev) => ({ ...prev, [metaKey]: { loading: false, error: '서버에 연결할 수 없습니다.' } }));
     }
   }
 
@@ -189,20 +220,53 @@ export default function CareerForm({ studentId, studentName, onCancel, onDone })
 
               {checkResults[field.key] && checkResults[field.key].length > 0 && (
                 <ul style={{ margin: '8px 0 0', paddingLeft: 18, fontSize: 13 }}>
-                  {checkResults[field.key].map((r, i) => (
-                    <li key={i} style={{ marginBottom: 8 }}>
-                      <div>
-                        입력한 내용: {r.title}
-                        {r.author ? ` (${r.author})` : ''} — {r.statusLabel}
-                      </div>
-                      {r.detail && (
-                        <div style={{ color: '#5b5546', whiteSpace: 'pre-wrap', marginTop: 2 }}>
-                          찾은 책: {r.detail}
+                  {checkResults[field.key].map((r, i) => {
+                    const needsAttention = r.statusLabel.indexOf('소장 확인') === -1;
+                    const meta = metaResults[`${field.key}__${i}`];
+                    return (
+                      <li key={i} style={{ marginBottom: 8 }}>
+                        <div>
+                          입력한 내용: {r.title}
+                          {r.author ? ` (${r.author})` : ''} — {r.statusLabel}
                         </div>
-                      )}
-                    </li>
-                  ))}
+                        {r.detail && (
+                          <div style={{ color: '#5b5546', whiteSpace: 'pre-wrap', marginTop: 2 }}>
+                            찾은 책: {r.detail}
+                          </div>
+                        )}
+
+                        {needsAttention && (
+                          <div style={{ marginTop: 4 }}>
+                            {meta?.loading && (
+                              <span style={{ color: '#5b5546' }}>저자·출판사 자동 검색 중...</span>
+                            )}
+                            {meta?.error && <span style={{ color: '#5b5546' }}>{meta.error}</span>}
+                            {meta?.results && meta.results.length === 0 && (
+                              <span style={{ color: '#5b5546' }}>저자·출판사 검색 결과가 없어요.</span>
+                            )}
+                            {meta?.results && meta.results.length > 0 && (
+                              <div>
+                                <span style={{ color: '#5b5546' }}>저자·출판사 자동 검색 결과 (참고용):</span>
+                                <ul style={{ margin: '4px 0 0', paddingLeft: 16 }}>
+                                  {meta.results.slice(0, 3).map((cand, ci) => (
+                                    <li key={ci}>
+                                      {cand.title} — {cand.author} ({cand.publisher})
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
+              )}
+              {checkResults[field.key] && checkResults[field.key].some((r) => r.statusLabel.indexOf('소장 확인') === -1) && (
+                <p style={{ margin: '6px 0 0', fontSize: 12, color: '#5b5546' }}>
+                  도서관에 없거나 확인이 더 필요한 책은, 제출 후 "나의 도서 현황" 페이지에서 정확한 제목·저자·출판사를 최종 확인하고 저장할 수 있어요.
+                </p>
               )}
             </div>
           )}
