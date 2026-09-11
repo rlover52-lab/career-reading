@@ -61,7 +61,7 @@ export function getReadingLog(studentId) {
   return callScript({ action: 'getReadingLog', studentId });
 }
 
-// 관리자 전용: 오늘 독서록을 기록했는지 학생별 확인
-export function getReadingLogToday(studentId, password) {
-  return callScript({ action: 'readingLogTodayOverview', studentId, password });
+// 관리자 전용: 특정 날짜(생략하면 오늘)에 독서록을 기록했는지 학생별 확인
+export function getReadingLogToday(studentId, password, date) {
+  return callScript({ action: 'readingLogTodayOverview', studentId, password, date });
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getAdminOverview, getReadingLogToday } from '../api';
 
 function formatDate(value) {
@@ -20,9 +20,10 @@ export default function AdminDashboard({ studentId, password }) {
   const [error, setError] = useState('');
 
   const [rlStudents, setRlStudents] = useState(null);
-  const [rlDate, setRlDate] = useState('');
+  const [rlDate, setRlDate] = useState(''); // 서버가 실제로 조회해준 날짜 (표시/드롭다운 값으로 사용)
+  const [rlAvailableDates, setRlAvailableDates] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(''); // 사용자가 드롭다운에서 고른 날짜. ''면 "오늘"을 의미
   const [rlError, setRlError] = useState('');
-  const rlRequestedRef = useRef(false); // state가 아니라 ref로: 이 값 때문에 effect가 다시 실행되면 안 되므로
 
   useEffect(() => {
     let cancelled = false;
@@ -43,17 +44,21 @@ export default function AdminDashboard({ studentId, password }) {
     };
   }, [studentId, password]);
 
-  // "오늘 독서록 확인" 탭을 처음 열 때만 불러옴
+  // "오늘 독서록 확인" 탭을 열 때, 그리고 드롭다운에서 날짜를 바꿀 때마다 다시 불러옴
+  // (selectedDate는 사용자가 직접 고를 때만 바뀌고, 이 effect가 스스로 바꾸는 일은 없어야
+  //  응답이 오기 전에 effect가 취소되는 문제가 안 생김)
   useEffect(() => {
-    if (tab !== 'readingLog' || rlRequestedRef.current) return;
-    rlRequestedRef.current = true;
+    if (tab !== 'readingLog') return;
     let cancelled = false;
-    getReadingLogToday(studentId, password)
+    setRlStudents(null);
+    setRlError('');
+    getReadingLogToday(studentId, password, selectedDate || undefined)
       .then((result) => {
         if (cancelled) return;
         if (result.success) {
           setRlStudents(result.students);
           setRlDate(result.date || '');
+          setRlAvailableDates(result.availableDates || []);
         } else {
           setRlError(result.message || '현황을 불러오지 못했습니다.');
           setRlStudents([]);
@@ -68,7 +73,7 @@ export default function AdminDashboard({ studentId, password }) {
     return () => {
       cancelled = true;
     };
-  }, [tab, studentId, password]);
+  }, [tab, selectedDate, studentId, password]);
 
   const submittedCount = students ? students.filter((s) => s.submitted).length : 0;
   const totalCount = students ? students.length : 0;
@@ -158,13 +163,30 @@ export default function AdminDashboard({ studentId, password }) {
       {tab === 'readingLog' && (
         <>
           <div className="step-header">
-            <h2>오늘 독서록 확인{rlDate ? ` (${rlDate})` : ''}</h2>
+            <h2>독서록 확인</h2>
             {rlStudents && rlStudents.length > 0 && (
               <p>
-                전체 {rlTotalCount}명 중 {rlDoneCount}명 기록 완료 · {rlTotalCount - rlDoneCount}명 미기록
+                {rlDate} 기준 · 전체 {rlTotalCount}명 중 {rlDoneCount}명 기록 완료 · {rlTotalCount - rlDoneCount}명 미기록
               </p>
             )}
           </div>
+
+          {rlAvailableDates.length > 0 && (
+            <div className="field" style={{ maxWidth: 220 }}>
+              <label htmlFor="rl-date-select">날짜 선택</label>
+              <select
+                id="rl-date-select"
+                value={selectedDate || rlDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+              >
+                {rlAvailableDates.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {rlError && <p className="error-text">{rlError}</p>}
           {rlStudents === null && !rlError && <div className="empty-state">불러오는 중...</div>}
