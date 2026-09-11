@@ -7,6 +7,11 @@ export default function Login({ onLoginSuccess }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const siteUrl = typeof window !== 'undefined' ? window.location.origin : '';
+  const qrSrc = siteUrl
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(siteUrl)}`
+    : '';
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
@@ -69,6 +74,15 @@ export default function Login({ onLoginSuccess }) {
 
         {error && <p className="error-text">{error}</p>}
       </form>
+
+      {qrSrc && (
+        <div style={{ marginTop: 28, textAlign: 'center' }}>
+          <p style={{ fontSize: 12, color: 'var(--sage-dark)', marginBottom: 8 }}>
+            이 QR코드를 스캔하면 바로 이 페이지로 들어올 수 있어요
+          </p>
+          <img src={qrSrc} alt="접속 QR코드" width={140} height={140} style={{ margin: '0 auto', display: 'block' }} />
+        </div>
+      )}
     </div>
   );
 }
