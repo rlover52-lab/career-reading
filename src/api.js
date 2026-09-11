@@ -50,3 +50,13 @@ export function getMyConfirmedBooks(studentId) {
 export function searchBookMeta(title) {
   return callScript({ action: 'searchBookMeta', title });
 }
+
+// 독서록: 오늘의 독서 기록 저장
+export function saveReadingLog(studentId, studentName, data) {
+  return callScript({ action: 'saveReadingLog', studentId, studentName, data });
+}
+
+// 독서록: 내 독서 기록 목록 불러오기
+export function getReadingLog(studentId) {
+  return callScript({ action: 'getReadingLog', studentId });
+}

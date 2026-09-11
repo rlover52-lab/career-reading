@@ -2,10 +2,11 @@ import { useState } from 'react';
 import Login from './components/Login';
 import CareerForm from './components/CareerForm';
 import HistoryView from './components/HistoryView';
+import ReadingLog from './components/ReadingLog';
 import BookStatus from './components/BookStatus';
 import AdminDashboard from './components/AdminDashboard';
 
-// view: 'menu' | 'form' | 'history' | 'books'
+// view: 'menu' | 'form' | 'history' | 'readingLog' | 'books'
 export default function App() {
   const [student, setStudent] = useState(null); // { studentId, studentName, isAdmin, password }
   const [view, setView] = useState('menu');
@@ -76,6 +77,12 @@ export default function App() {
           </div>
 
           <div className="menu-card">
+            <h2>독서록</h2>
+            <p>일주일에 한 번, 읽고 있는 책의 진도와 감상을 간단히 기록해보세요.</p>
+            <button onClick={() => setView('readingLog')}>기록하러 가기</button>
+          </div>
+
+          <div className="menu-card">
             <h2>나의 도서 현황</h2>
             <p>2학기에 읽고 싶다고 적은 책이 학교 도서관에 있는지 확인해보세요.</p>
             <button onClick={() => setView('books')}>확인하러 가기</button>
@@ -96,6 +103,10 @@ export default function App() {
       )}
 
       {view === 'history' && <HistoryView studentId={student.studentId} onCancel={() => setView('menu')} />}
+
+      {view === 'readingLog' && (
+        <ReadingLog studentId={student.studentId} studentName={student.studentName} onCancel={() => setView('menu')} />
+      )}
 
       {view === 'books' && (
         <BookStatus studentId={student.studentId} studentName={student.studentName} onCancel={() => setView('menu')} />
