@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getAdminOverview, getReadingLogToday } from '../api';
 
 function formatDate(value) {
@@ -22,7 +22,7 @@ export default function AdminDashboard({ studentId, password }) {
   const [rlStudents, setRlStudents] = useState(null);
   const [rlDate, setRlDate] = useState('');
   const [rlError, setRlError] = useState('');
-  const [rlRequested, setRlRequested] = useState(false);
+  const rlRequestedRef = useRef(false); // state가 아니라 ref로: 이 값 때문에 effect가 다시 실행되면 안 되므로
 
   useEffect(() => {
     let cancelled = false;
@@ -45,8 +45,8 @@ export default function AdminDashboard({ studentId, password }) {
 
   // "오늘 독서록 확인" 탭을 처음 열 때만 불러옴
   useEffect(() => {
-    if (tab !== 'readingLog' || rlRequested) return;
-    setRlRequested(true);
+    if (tab !== 'readingLog' || rlRequestedRef.current) return;
+    rlRequestedRef.current = true;
     let cancelled = false;
     getReadingLogToday(studentId, password)
       .then((result) => {
@@ -68,7 +68,7 @@ export default function AdminDashboard({ studentId, password }) {
     return () => {
       cancelled = true;
     };
-  }, [tab, rlRequested, studentId, password]);
+  }, [tab, studentId, password]);
 
   const submittedCount = students ? students.filter((s) => s.submitted).length : 0;
   const totalCount = students ? students.length : 0;
