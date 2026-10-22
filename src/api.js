@@ -65,3 +65,12 @@ export function getReadingLog(studentId) {
 export function getReadingLogToday(studentId, password, date) {
   return callScript({ action: 'readingLogTodayOverview', studentId, password, date });
 }
+// 탐구 질문 다듬기: 저장 (탐구질문 탭에 새 행 추가)
+export function saveInquiry(studentId, studentName, data) {
+  return callScript({ action: 'saveInquiry', studentId, studentName, data });
+}
+
+// 탐구 질문 다듬기: 내가 저장한 탐구 질문 불러오기
+export function getInquiry(studentId) {
+  return callScript({ action: 'getInquiry', studentId });
+}

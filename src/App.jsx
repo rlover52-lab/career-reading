@@ -5,8 +5,9 @@ import HistoryView from './components/HistoryView';
 import ReadingLog from './components/ReadingLog';
 import BookStatus from './components/BookStatus';
 import AdminDashboard from './components/AdminDashboard';
+import InquiryQuestion from './components/InquiryQuestion';
 
-// view: 'menu' | 'form' | 'history' | 'readingLog' | 'books'
+// view: 'menu' | 'form' | 'history' | 'readingLog' | 'books' | 'inquiry'
 export default function App() {
   const [student, setStudent] = useState(null); // { studentId, studentName, isAdmin, password }
   const [view, setView] = useState('menu');
@@ -65,6 +66,12 @@ export default function App() {
           )}
 
           <div className="menu-card">
+            <h2>탐구 질문 다듬기</h2>
+            <p>독서록에 적은 질문을 골라, 조사해볼 만한 탐구 질문으로 바꿔보세요.</p>
+            <button onClick={() => setView('inquiry')}>시작하기</button>
+          </div>
+
+          <div className="menu-card">
             <h2>새 기록 작성하기</h2>
             <p>1학기 되돌아보기부터 2학기 계획까지, 순서대로 작성해보세요.</p>
             <button onClick={() => setView('form')}>작성 시작</button>
@@ -106,6 +113,10 @@ export default function App() {
 
       {view === 'readingLog' && (
         <ReadingLog studentId={student.studentId} studentName={student.studentName} onCancel={() => setView('menu')} />
+      )}
+
+      {view === 'inquiry' && (
+        <InquiryQuestion studentId={student.studentId} studentName={student.studentName} onCancel={() => setView('menu')} />
       )}
 
       {view === 'books' && (
